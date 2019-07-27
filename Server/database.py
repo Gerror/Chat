@@ -3,31 +3,31 @@ import time
 
 class DataBase(object):
 	def __init__(self):
-		self.conn = sqlite3.connect("ChatServer.db", check_same_thread = False) #Подключаемся к базе
-		self.cursor = self.conn.cursor() #Устанавливаем курсов
-		#Создаем таблицу пользователей
+		self.conn = sqlite3.connect("ChatServer.db", check_same_thread = False)
+		self.cursor = self.conn.cursor()
+		#Таблицу пользователей
 		self.cursor.execute("""CREATE TABLE IF NOT EXISTS users
 							(id integer PRIMARY KEY, username text NOT NULL,
 							created_at text NOT NULL)"""
 							)
-		#Создаем таблицу чатов
+		#Таблица чатов
 		self.cursor.execute("""CREATE TABLE IF NOT EXISTS chats
 							(id integer PRIMARY KEY, name text NOT NULL,
 							created_at text NOT NULL)"""
 							)
-		#Создаем таблицу чат_пользователей (Отношение многие-ко-многим)
+		#Таблица чат_пользователь (Отношение многие-ко-многим)
 		self.cursor.execute("""CREATE TABLE IF NOT EXISTS chat_user (chat_id integer, user_id integer,
 							FOREIGN KEY (chat_id) REFERENCES chats(id)
 							FOREIGN KEY (user_id) REFERENCES users(id))"""
 							)
-		#Создаем таблицу сообщений
+		#Таблицу сообщений
 		self.cursor.execute("""CREATE TABLE IF NOT EXISTS messages
 							(id integer PRIMARY KEY, chat integer NOT NULL,
 							author integer NOT NULL, msg text NOT NULL,
 							created_at text NOT NULL, FOREIGN KEY (author) REFERENCES users(id))"""
 							)
 
-	def AddUser(self, usName): #Добавить пользователя в базу
+	def AddUser(self, usName): 				 #Добавить пользователя в базу
 		try:
 			if(self.GetUserId(usName) != -1):
 				return -1
@@ -54,7 +54,7 @@ class DataBase(object):
 		except:
 			return -1
 
-	def AddMessage(self, chId, usId, msg): #Добавить сообщение в базу 
+	def AddMessage(self, chId, usId, msg):   #Добавить сообщение в базу 
 		try:
 			req = (chId, usId, msg, time.strftime("%Y-%m-%d-%H.%M.%S",time.localtime()))
 			self.cursor.execute("""INSERT INTO messages(chat, author, msg, created_at)
@@ -66,8 +66,8 @@ class DataBase(object):
 		except:
 			return -1
 
-	def GetChatList(self, usId): #Получить список чатов пользователя
-		try:#Сортировка по времени последнего сообщения
+	def GetChatList(self, usId):			 #Получить список чатов пользователя
+		try:
 			req = """SELECT id, name, created_at
 		 			FROM (chats LEFT JOIN chat_user ON id = chat_id)
 		 			LEFT OUTER JOIN (SELECT chat, MAX(created_at) AS last_msg_time 
@@ -80,7 +80,7 @@ class DataBase(object):
 		except:
 			return -1
 
-	def GetChatMessage(self, chId): #Получить список ВСЕХ сообщений чата
+	def GetChatMessage(self, chId):			#Получить список ВСЕХ сообщений чата
 		try:
 			req = "SELECT * FROM messages WHERE chat = " + str(chId) + " ORDER BY created_at"
 			self.cursor.execute(req)
@@ -89,7 +89,7 @@ class DataBase(object):
 		except:
 			return -1 
 		
-	def GetChatUsers(self, chatId): #Получить идентификаторы пользователей чата
+	def GetChatUsers(self, chatId):			#Получить идентификаторы пользователей чата
 		try:
 			req = "SELECT user_id FROM chat_user WHERE chat_id = " + str(chatId)
 			self.cursor.execute(req)
@@ -101,7 +101,7 @@ class DataBase(object):
 		except:
 			return -1
 
-	def GetChatName(self, chatId): #Получить имя чата по идентификатору
+	def GetChatName(self, chatId):			#Получить имя чата по идентификатору
 		try:
 			req = "SELECT name FROM chats WHERE id = " + str(chatId)
 			self.cursor.execute(req)
@@ -110,7 +110,7 @@ class DataBase(object):
 		except:
 			return -1
 
-	def GetUserId(self, username): #Получить идентификатор пользователя по имени
+	def GetUserId(self, username):			#Получить идентификатор пользователя по имени
 		try:
 			req = "SELECT id FROM users WHERE username = '" + username + "'"
 			self.cursor.execute(req)
@@ -119,7 +119,7 @@ class DataBase(object):
 		except:
 			return -1
 
-	def GetUserName(self, usId): #Получить имя пользователя по идентификатору
+	def GetUserName(self, usId):			#Получить имя пользователя по идентификатору
 		try:
 			req = "SELECT username FROM users WHERE id = " + str(usId)
 			self.cursor.execute(req)

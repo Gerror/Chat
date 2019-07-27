@@ -45,7 +45,7 @@ class Client(object):
 		self.thread_recv.join()
 
 	def RecvMessage(self):
-		try: #Здесь мы разрываем соединение
+		try:
 			while not self.quit:
 				answ = self.socket_client.recv(1024)
 				answ = answ.decode("utf8")
@@ -71,7 +71,6 @@ class Client(object):
 				if(msgNoChat == "*Stop"):
 					self.Stop()
 					break
-
 				elif(msgNoChat == "*ChangeChat"):
 					print("Enter chat id:")
 					inputId = int(input())
